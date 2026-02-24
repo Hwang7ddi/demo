@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}宿舍管理 - 管理员{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-door-open-fill me-2 text-primary"></i>宿舍管理</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDormModal">
+        <i class="bi bi-plus-circle me-1"></i>添加宿舍
+    </button>
+</div>
+
+<!-- 宿舍列表 -->
+<div class="card shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>楼栋</th>
+                        <th>宿舍号</th>
+                        <th>类型</th>
+                        <th>容量</th>
+                        <th>已住</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dorm in dormitories %}
+                    <tr>
+                        <td>{{ dorm.building }}</td>
+                        <td>{{ dorm.number }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ dorm.type }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">{{ dorm.capacity }}人</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">{{ dorm.students|length }}人</span>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: {{ (dorm.students|length / dorm.capacity * 100)|round(0) if dorm.capacity > 0 else 0 }}%" 
+                                         aria-valuenow="{{ dorm.students|length }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="{{ dorm.capacity }}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if dorm.status == '良好' %}
+                            <span class="badge bg-success">{{ dorm.status }}</span>
+                            {% elif dorm.status == '一般' %}
+                            <span class="badge bg-warning">{{ dorm.status }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ dorm.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editDormModal"
+                                    data-id="{{ dorm.id }}"
+                                    data-building="{{ dorm.building }}"
+                                    data-number="{{ dorm.number }}"
+                                    data-type="{{ dorm.type }}"
+                                    data-capacity="{{ dorm.capacity }}"
+                                    data-status="{{ dorm.status }}">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <form method="POST" action="{{ url_for('delete_dormitory', id=dorm.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要删除该宿舍吗？')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">暂无宿舍数据</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 添加宿舍模态框 -->
+<div class="modal fade" id="addDormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-house-add me-2"></i>添加新宿舍
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_dormitory') }}" id="addDormForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">楼栋</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-building"></i>
+                            </span>
+                            <input type="text" class="form-control" name="building" required placeholder="如：1号楼">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">宿舍号</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-hash"></i>
+                            </span>
+                            <input type="text" class="form-control" name="number" required placeholder="如：101">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">宿舍类型</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-people"></i>
+                            </span>
+                            <select class="form-select" name="type" id="dormType" required>
+                                <option value="4人间">4人间</option>
+                                <option value="6人间">6人间</option>
+                                <option value="8人间">8人间</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">容量</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="number" class="form-control" name="capacity" id="dormCapacity" required min="1" max="8">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">状态</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-flag"></i>
+                            </span>
+                            <select class="form-select" name="status" required>
+                                <option value="良好">良好</option>
+                                <option value="一般">一般</option>
+                                <option value="需要维修">需要维修</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>取消
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑宿舍模态框 -->
+<div class="modal fade" id="editDormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-house-gear me-2"></i>编辑宿舍
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="" id="editDormForm">
+                <input type="hidden" name="id" id="editDormId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">楼栋</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-building"></i>
+                            </span>
+                            <input type="text" class="form-control" id="editBuilding" name="building" required placeholder="如：1号楼">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">宿舍号</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-hash"></i>
+                            </span>
+                            <input type="text" class="form-control" id="editNumber" name="number" required placeholder="如：101">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">宿舍类型</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-people"></i>
+                            </span>
+                            <select class="form-select" name="type" id="editDormType" required>
+                                <option value="4人间">4人间</option>
+                                <option value="6人间">6人间</option>
+                                <option value="8人间">8人间</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">容量</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="number" class="form-control" name="capacity" id="editDormCapacity" required min="1" max="8">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">状态</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-flag"></i>
+                            </span>
+                            <select class="form-select" name="status" id="editStatus" required>
+                                <option value="良好">良好</option>
+                                <option value="一般">一般</option>
+                                <option value="需要维修">需要维修</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>取消
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i>更新
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 添加宿舍模态框相关逻辑
+    const dormType = document.getElementById('dormType');
+    const dormCapacity = document.getElementById('dormCapacity');
+    const addDormForm = document.getElementById('addDormForm');
+    
+    // 根据宿舍类型设置容量最大值
+    function updateCapacityMax() {
+        const typeValue = dormType.value;
+        let maxValue = 8;
+        
+        switch(typeValue) {
+            case '4人间':
+                maxValue = 4;
+                break;
+            case '6人间':
+                maxValue = 6;
+                break;
+            case '8人间':
+                maxValue = 8;
+                break;
+        }
+        
+        dormCapacity.max = maxValue;
+        // 如果当前容量超过最大值，则设置为最大值
+        if (parseInt(dormCapacity.value) > maxValue) {
+            dormCapacity.value = maxValue;
+        }
+    }
+    
+    // 监听宿舍类型变化
+    dormType.addEventListener('change', updateCapacityMax);
+    
+    // 页面加载时初始化
+    updateCapacityMax();
+    
+    // 表单提交前验证
+    addDormForm.addEventListener('submit', function(e) {
+        const typeValue = dormType.value;
+        const capacityValue = parseInt(dormCapacity.value);
+        let maxValue = 8;
+        
+        switch(typeValue) {
+            case '4人间':
+                maxValue = 4;
+                break;
+            case '6人间':
+                maxValue = 6;
+                break;
+            case '8人间':
+                maxValue = 8;
+                break;
+        }
+        
+        if (capacityValue > maxValue) {
+            e.preventDefault();
+            alert(`容量不能超过${typeValue}的标准容量(${maxValue}人)`);
+            return false;
+        }
+        
+        if (capacityValue < 1) {
+            e.preventDefault();
+            alert('容量必须大于0');
+            return false;
+        }
+    });
+    
+    // 编辑宿舍模态框相关逻辑
+    const editDormModal = document.getElementById('editDormModal');
+    editDormModal.addEventListener('show.bs.modal', function (event) {
+        // 获取触发按钮
+        const button = event.relatedTarget;
+        
+        // 获取宿舍信息
+        const id = button.getAttribute('data-id');
+        const building = button.getAttribute('data-building');
+        const number = button.getAttribute('data-number');
+        const type = button.getAttribute('data-type');
+        const capacity = button.getAttribute('data-capacity');
+        const status = button.getAttribute('data-status');
+        
+        // 填充表单
+        document.getElementById('editDormId').value = id;
+        document.getElementById('editBuilding').value = building;
+        document.getElementById('editNumber').value = number;
+        document.getElementById('editDormType').value = type;
+        document.getElementById('editDormCapacity').value = capacity;
+        document.getElementById('editStatus').value = status;
+        
+        // 设置表单action
+        const form = document.getElementById('editDormForm');
+        form.action = `/admin/dormitory/edit/${id}`;
+        
+        // 更新编辑模态框的容量限制
+        const editDormType = document.getElementById('editDormType');
+        const editDormCapacity = document.getElementById('editDormCapacity');
+        
+        function updateEditCapacityMax() {
+            const typeValue = editDormType.value;
+            let maxValue = 8;
+            
+            switch(typeValue) {
+                case '4人间':
+                    maxValue = 4;
+                    break;
+                case '6人间':
+                    maxValue = 6;
+                    break;
+                case '8人间':
+                    maxValue = 8;
+                    break;
+            }
+            
+            editDormCapacity.max = maxValue;
+            // 如果当前容量超过最大值，则设置为最大值
+            if (parseInt(editDormCapacity.value) > maxValue) {
+                editDormCapacity.value = maxValue;
+            }
+        }
+        
+        // 监听宿舍类型变化
+        editDormType.addEventListener('change', updateEditCapacityMax);
+        
+        // 初始化容量限制
+        updateEditCapacityMax();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}提交维修申请 - 学生{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-tools me-2"></i>提交维修申请
+                </h3>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" action="{{ url_for('submit_repair') }}" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">基本信息</h5>
+                            <div class="mb-3">
+                                <label for="building" class="form-label">宿舍楼号 *</label>
+                                <input type="text" class="form-control" id="building" name="building" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="dorm_number" class="form-label">宿舍号 *</label>
+                                <input type="text" class="form-control" id="dorm_number" name="dorm_number" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="applicant_name" class="form-label">申请人姓名 *</label>
+                                <input type="text" class="form-control" id="applicant_name" name="applicant_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">联系方式</h5>
+                            <div class="mb-3">
+                                <label for="bed_number" class="form-label">床位号</label>
+                                <input type="text" class="form-control" id="bed_number" name="bed_number">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">联系电话</label>
+                                <input type="text" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <h5 class="text-muted mb-3">问题描述</h5>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">问题详细描述 *</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <h5 class="text-muted mb-3">附件</h5>
+                            <div class="mb-3">
+                                <label for="image" class="form-label">上传图片</label>
+                                <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                                <div class="form-text">支持 JPG、PNG、GIF 格式，文件大小不超过 5MB</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill">
+                            <i class="bi bi-send-fill me-2"></i>提交申请
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-header {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important;
+}
+</style>
+{% endblock %}

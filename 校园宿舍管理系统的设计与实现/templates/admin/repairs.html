@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}维修管理 - 管理员{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-wrench me-2 text-primary"></i>维修申请管理</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('admin_repairs', status='all') }}" class="btn {% if current_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            全部申请
+        </a>
+        <a href="{{ url_for('admin_repairs', status='待处理') }}" class="btn {% if current_status == '待处理' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            待处理
+        </a>
+        <a href="{{ url_for('admin_repairs', status='处理中') }}" class="btn {% if current_status == '处理中' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            处理中
+        </a>
+        <a href="{{ url_for('admin_repairs', status='已完成') }}" class="btn {% if current_status == '已完成' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            已完成
+        </a>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+    <div class="col">
+        <div class="card bg-primary/10 border-primary shadow-sm rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-primary">总申请数</h5>
+                        <h1 class="display-4 fw-bold">{{ repair_total }}</h1>
+                    </div>
+                    <i class="bi bi-clipboard-data-fill text-primary fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning/10 border-warning shadow-sm rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-warning">待处理</h5>
+                        <h1 class="display-4 fw-bold">{{ repair_pending }}</h1>
+                    </div>
+                    <i class="bi bi-clock-fill text-warning fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-info/10 border-info shadow-sm rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-info">处理中</h5>
+                        <h1 class="display-4 fw-bold">{{ repair_processing }}</h1>
+                    </div>
+                    <i class="bi bi-tools text-info fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-success/10 border-success shadow-sm rounded-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-success">已完成</h5>
+                        <h1 class="display-4 fw-bold">{{ repair_completed }}</h1>
+                    </div>
+                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 维修申请列表 -->
+<div class="card shadow-sm rounded-4 overflow-hidden border-light">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>申请编号</th>
+                        <th>宿舍信息</th>
+                        <th>申请人</th>
+                        <th>问题摘要</th>
+                        <th>图片</th>
+                        <th>状态</th>
+                        <th>提交时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repair in repairs %}
+                    <tr>
+                        <td>{{ repair.id }}</td>
+                        <td>{{ repair.dormitory.building }}-{{ repair.dormitory.number }}</td>
+                        <td>{{ repair.user.name }}</td>
+                        <td>
+                            {% set desc_lines = repair.description.split('\n') %}
+                            {{ desc_lines[4] if desc_lines|length > 4 else repair.description[:30] + '...' }}
+                        </td>
+                        <td>
+                            {% if repair.image_url %}
+                                <img src="{{ url_for('static', filename=repair.image_url) }}" width="50" class="rounded">
+                            {% else %}
+                                <span class="text-muted">无</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if repair.status == '待处理' %}
+                                <span class="badge bg-warning">待处理</span>
+                            {% elif repair.status == '处理中' %}
+                                <span class="badge bg-info">处理中</span>
+                            {% elif repair.status == '已完成' %}
+                                <span class="badge bg-success">已完成</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ repair.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ repair.create_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_repair_detail', repair_id=repair.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye-fill me-1"></i>查看详情
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">暂无维修申请记录</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 表格美化 */
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* 徽章美化 */
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+    border-radius: 0.375rem;
+}
+
+/* 按钮美化 */
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 启用工具提示
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

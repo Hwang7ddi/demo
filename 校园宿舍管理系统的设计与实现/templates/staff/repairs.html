@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}维修处理 - 工作人员{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-wrench me-2 text-primary"></i>维修处理</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('staff_repairs', status='all') }}" class="btn {% if current_status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            全部
+        </a>
+        <a href="{{ url_for('staff_repairs', status='待处理') }}" class="btn {% if current_status == '待处理' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            待处理
+        </a>
+        <a href="{{ url_for('staff_repairs', status='处理中') }}" class="btn {% if current_status == '处理中' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            处理中
+        </a>
+        <a href="{{ url_for('staff_repairs', status='已完成') }}" class="btn {% if current_status == '已完成' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            已完成
+        </a>
+    </div>
+</div>
+
+<!-- 维修申请列表 -->
+<div class="card shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>申请编号</th>
+                        <th>申请时间</th>
+                        <th>申请人</th>
+                        <th>宿舍</th>
+                        <th>问题描述</th>
+                        <th>状态</th>
+                        <th>处理人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repair in repairs %}
+                    <tr>
+                        <td>{{ repair.id }}</td>
+                        <td>{{ repair.create_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ repair.user.name }}</td>
+                        <td>{{ repair.dormitory.building }}-{{ repair.dormitory.number }}</td>
+                        <td>
+                            {% if repair.description|length > 50 %}
+                                {{ repair.description[:50] }}...
+                            {% else %}
+                                {{ repair.description }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if repair.status == '待处理' %}
+                            <span class="badge bg-warning">{{ repair.status }}</span>
+                            {% elif repair.status == '处理中' %}
+                            <span class="badge bg-info">{{ repair.status }}</span>
+                            {% else %}
+                            <span class="badge bg-success">{{ repair.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if repair.handler %}
+                            {{ repair.handler.user.name }}
+                            {% else %}
+                            <span class="text-muted">未指定</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('staff_repair_detail', repair_id=repair.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-eye-fill me-1"></i>查看
+                            </a>
+                            
+                            {% if repair.status == '待处理' %}
+                            <form method="POST" action="{{ url_for('handle_repair', id=repair.id) }}" style="display: inline;">
+                                <input type="hidden" name="action" value="accept">
+                                <button type="submit" class="btn btn-sm btn-info">
+                                    <i class="bi bi-check-circle-fill me-1"></i>接受
+                                </button>
+                            </form>
+                            {% elif repair.status == '处理中' and repair.handler_id == staff.id %}
+                            <form method="POST" action="{{ url_for('handle_repair', id=repair.id) }}" style="display: inline;">
+                                <input type="hidden" name="action" value="complete">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-all me-1"></i>完成
+                                </button>
+                            </form>
+                            {% elif repair.status == '处理中' and repair.handler_id != staff.id %}
+                            <span class="text-muted">其他人员处理中</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">暂无维修申请记录</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+    border-radius: 0.375rem;
+}
+
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 启用工具提示
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
