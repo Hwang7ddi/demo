@@ -1,0 +1,45 @@
+<form method="POST" action="{{ url_for('add_student') }}">
+    <div class="mb-3">
+        <label for="name" class="form-label">姓名 *</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="gender" class="form-label">性别 *</label>
+        <select class="form-select" id="gender" name="gender" required>
+            <option value="男">男</option>
+            <option value="女">女</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="major" class="form-label">专业 *</label>
+        <select class="form-select" id="major" name="major" required>
+            <option value="">请选择专业</option>
+            <option value="计算机科学与技术">计算机科学与技术</option>
+            <option value="软件工程">软件工程</option>
+            <option value="电子信息工程">电子信息工程</option>
+            <option value="自动化">自动化</option>
+            <option value="机械设计制造及其自动化">机械设计制造及其自动化</option>
+            <option value="土木工程">土木工程</option>
+            <option value="建筑学">建筑学</option>
+            <option value="金融学">金融学</option>
+            <option value="工商管理">工商管理</option>
+            <option value="艺术">艺术</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="dormitory_id" class="form-label">分配宿舍</label>
+        <select class="form-select" id="dormitory_id" name="dormitory_id">
+            <option value="">不分配宿舍</option>
+            {% for dormitory in dormitories %}
+                <option value="{{ dormitory.id }}">{{ dormitory.building }}-{{ dormitory.number }} ({{ dormitory.type }}, 已住{{ dormitory.students|length }}/{{ dormitory.capacity }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">添加学生</button>
+    </div>
+</form>

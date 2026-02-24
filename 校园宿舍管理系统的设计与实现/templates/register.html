@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - 校园宿舍管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg rounded-4 overflow-hidden border-0 login-card">
+            <div class="card-header bg-gradient-primary text-white text-center py-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-building-fill me-2"></i>校园宿舍管理系统
+                </h3>
+                <p class="text-light fs-6 mb-0">创建新账号</p>
+            </div>
+            <div class="card-body p-5">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-4">
+                        <label for="username" class="form-label fw-bold">用户名</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-person-fill text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-lg border-start-0" id="username" name="username" required placeholder="请输入用户名">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="name" class="form-label fw-bold">真实姓名</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-person-badge-fill text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-lg border-start-0" id="name" name="name" required placeholder="请输入真实姓名">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-bold">密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-lock-fill text-primary"></i>
+                            </span>
+                            <input type="password" class="form-control form-control-lg border-start-0" id="password" name="password" required placeholder="请输入密码">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label fw-bold">确认密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-lock-fill text-primary"></i>
+                            </span>
+                            <input type="password" class="form-control form-control-lg border-start-0" id="confirm_password" name="confirm_password" required placeholder="请再次输入密码">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="role" class="form-label fw-bold">用户角色</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-tags-fill text-primary"></i>
+                            </span>
+                            <select class="form-select form-control-lg border-start-0" id="role" name="role" required>
+                                <option value="">请选择角色</option>
+                                <option value="student">学生</option>
+                                <option value="staff">工作人员</option>
+                            </select>
+                        </div>
+                        <div class="form-text text-muted">
+                            <small><i class="bi bi-info-circle-fill me-1"></i>注意：管理员账号只能由系统管理员创建</small>
+                        </div>
+                    </div>
+                    
+                    <!-- 学生宿舍信息（仅当选择学生角色时显示） -->
+                    <div id="student-dorm-info" style="display: none;">
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">宿舍信息（可选）</h5>
+                                <p class="text-muted">您可以稍后在个人资料中绑定宿舍信息</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="building" class="form-label">宿舍楼号</label>
+                                            <input type="text" class="form-control" id="building" name="building" placeholder="如：1号楼">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="dorm_number" class="form-label">宿舍号</label>
+                                            <input type="text" class="form-control" id="dorm_number" name="dorm_number" placeholder="如：101">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="bed_number" class="form-label">床位号</label>
+                                            <input type="text" class="form-control" id="bed_number" name="bed_number" placeholder="如：1号床">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="phone" class="form-label">联系电话</label>
+                                            <input type="text" class="form-control" id="phone" name="phone" placeholder="请输入联系电话">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg py-3 fs-5 rounded-pill">
+                            <i class="bi bi-person-plus-fill me-2"></i>注册账号
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-2">已有账号？</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary rounded-pill">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>立即登录
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-center py-3">
+                <small class="text-muted">
+                    <i class="bi bi-cpu-fill me-1"></i>校园宿舍管理系统 © 2025
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: transparent !important;
+    }
+    
+    .login-card {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        margin: 1rem;
+    }
+    
+    .card-header {
+        background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important;
+        border-bottom: none;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important;
+    }
+    
+    .input-group-text {
+        border-radius: 0.5rem 0 0 0.5rem !important;
+    }
+    
+    .form-control {
+        border-radius: 0 0.5rem 0.5rem 0 !important;
+        padding-left: 1rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        border-color: #86b7fe;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0b5ed7, #0a58ca);
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+    }
+    
+    .card-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    @media (max-width: 768px) {
+        .login-card {
+            margin: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const studentDormInfo = document.getElementById('student-dorm-info');
+    
+    roleSelect.addEventListener('change', function() {
+        if (this.value === 'student') {
+            studentDormInfo.style.display = 'block';
+        } else {
+            studentDormInfo.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}维修申请详情 - 管理员{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-wrench me-2"></i>维修申请详情
+                </h3>
+            </div>
+            <div class="card-body p-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-muted mb-3">基本信息</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">申请编号:</span>
+                                <span>{{ repair.id }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">宿舍信息:</span>
+                                <span>{{ repair.dormitory.building }}-{{ repair.dormitory.number }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">申请人:</span>
+                                <span>{{ repair.user.name }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">提交时间:</span>
+                                <span>{{ repair.create_time.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">当前状态:</span>
+                                <span>
+                                    {% if repair.status == '待处理' %}
+                                        <span class="badge bg-warning">待处理</span>
+                                    {% elif repair.status == '处理中' %}
+                                        <span class="badge bg-info">处理中</span>
+                                    {% elif repair.status == '已完成' %}
+                                        <span class="badge bg-success">已完成</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ repair.status }}</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-muted mb-3">处理信息</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">处理人:</span>
+                                <span>
+                                    {% if repair.handler_id %}
+                                        {{ repair.user.name }}
+                                    {% else %}
+                                        <span class="text-muted">未分配</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="fw-medium">处理时间:</span>
+                                <span>
+                                    {% if repair.handle_time %}
+                                        {{ repair.handle_time.strftime('%Y-%m-%d %H:%M') }}
+                                    {% else %}
+                                        <span class="text-muted">未处理</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-12 mt-4">
+                        <h5 class="fw-bold text-muted mb-3">问题描述</h5>
+                        <div class="bg-light p-3 rounded-3">
+                            <pre class="mb-0">{{ repair.description }}</pre>
+                        </div>
+                    </div>
+                    
+                    {% if repair.image_url %}
+                    <div class="col-12 mt-4">
+                        <h5 class="fw-bold text-muted mb-3">附件图片</h5>
+                        <div class="text-center">
+                            <img src="{{ url_for('static', filename=repair.image_url) }}" alt="维修图片" class="img-fluid rounded-3" style="max-height: 300px;">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_repairs') }}" class="btn btn-secondary rounded-pill">
+                        <i class="bi bi-arrow-left-circle-fill me-1"></i>返回列表
+                    </a>
+                    <div>
+                        {% if repair.status == '待处理' %}
+                            <span class="badge bg-warning">等待处理</span>
+                        {% elif repair.status == '处理中' %}
+                            <span class="badge bg-info">正在处理</span>
+                        {% elif repair.status == '已完成' %}
+                            <span class="badge bg-success">处理完成</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-header {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+}
+</style>
+{% endblock %}

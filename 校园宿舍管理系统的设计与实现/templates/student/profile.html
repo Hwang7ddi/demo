@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}个人信息 - 学生{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-person-fill me-2"></i>个人信息
+                </h3>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" action="{{ url_for('update_student_info') }}">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">基本信息</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-medium">姓名：</span>
+                                    <span>{{ student.user.name }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-medium">学号：</span>
+                                    <span>{{ student.student_id }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-medium">专业：</span>
+                                    <span>
+                                        <select class="form-select form-select-sm" name="major" required>
+                                            <option value="">请选择</option>
+                                            <option value="计算机科学与技术" {% if student.major == '计算机科学与技术' %}selected{% endif %}>计算机科学与技术</option>
+                                            <option value="软件工程" {% if student.major == '软件工程' %}selected{% endif %}>软件工程</option>
+                                            <option value="电子信息工程" {% if student.major == '电子信息工程' %}selected{% endif %}>电子信息工程</option>
+                                            <option value="自动化" {% if student.major == '自动化' %}selected{% endif %}>自动化</option>
+                                            <option value="机械设计制造及其自动化" {% if student.major == '机械设计制造及其自动化' %}selected{% endif %}>机械设计制造及其自动化</option>
+                                            <option value="土木工程" {% if student.major == '土木工程' %}selected{% endif %}>土木工程</option>
+                                            <option value="建筑学" {% if student.major == '建筑学' %}selected{% endif %}>建筑学</option>
+                                            <option value="金融学" {% if student.major == '金融学' %}selected{% endif %}>金融学</option>
+                                            <option value="工商管理" {% if student.major == '工商管理' %}selected{% endif %}>工商管理</option>
+                                            <option value="艺术" {% if student.major == '艺术' %}selected{% endif %}>艺术</option>
+                                        </select>
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-medium">性别：</span>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="gender" id="male" value="男" {% if student.gender == '男' %}checked{% endif %} required>
+                                        <label class="btn btn-outline-primary" for="male">
+                                            <i class="bi bi-gender-male me-1"></i>男
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="gender" id="female" value="女" {% if student.gender == '女' %}checked{% endif %}>
+                                        <label class="btn btn-outline-danger" for="female">
+                                            <i class="bi bi-gender-female me-1"></i>女
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                            <h5 class="text-muted mt-4 mb-3">联系方式</h5>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">联系电话</label>
+                                <input type="text" class="form-control" id="phone" name="phone" value="{{ student.phone or '' }}" placeholder="请输入联系电话">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">宿舍信息</h5>
+                            <ul class="list-group list-group-flush">
+                                {% if student.dormitory %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-medium">宿舍楼号：</span>
+                                    <span>{{ student.dormitory.building }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-medium">宿舍号：</span>
+                                    <span>{{ student.dormitory.number }}</span>
+                                </li>
+                                {% else %}
+                                <li class="list-group-item">
+                                    <span class="text-muted">暂未分配宿舍</span>
+                                </li>
+                                {% endif %}
+                                
+                                <li class="list-group-item">
+                                    <label for="building" class="form-label fw-medium">宿舍楼号</label>
+                                    <input type="text" class="form-control form-control-sm" id="building" name="building" 
+                                           value="{{ student.dormitory.building if student.dormitory else '' }}" 
+                                           placeholder="如：1号楼">
+                                </li>
+                                <li class="list-group-item">
+                                    <label for="dorm_number" class="form-label fw-medium">宿舍号</label>
+                                    <input type="text" class="form-control form-control-sm" id="dorm_number" name="dorm_number" 
+                                           value="{{ student.dormitory.number if student.dormitory else '' }}" 
+                                           placeholder="如：101">
+                                </li>
+                                <li class="list-group-item">
+                                    <label for="bed_number" class="form-label fw-medium">床位号</label>
+                                    <input type="text" class="form-control form-control-sm" id="bed_number" name="bed_number" 
+                                           value="{{ student.bed_number or '' }}" 
+                                           placeholder="如：1号床">
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill">
+                            <i class="bi bi-save-fill me-2"></i>保存信息
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-header {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important;
+}
+
+.btn-check:checked + .btn-outline-primary {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.btn-check:checked + .btn-outline-danger {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+</style>
+{% endblock %}
