@@ -1,0 +1,22 @@
+{
+  "libVersion": "3.16.1",
+  "projectname": "%E7%AC%AC5%E7%BB%84-%E3%80%8A%E4%B9%A1%E6%9D%91%E5%BA%94%E6%80%A5%E5%B9%BF%E6%92%AD%E4%B8%8E%E9%A2%84%E8%AD%A6%E4%BF%A1%E6%81%AF%E8%81%94%E5%8A%A8%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E3%80%8B-13%E9%BB%84%E9%94%A1%E8%BE%89-18%E6%9D%8E%E6%99%BA%E8%BE%89-08%E4%BD%95%E6%A2%93%E6%81%92-%E6%BA%90%E4%BB%A3%E7%A0%81",
+  "setting": {
+    "urlCheck": false,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "compileHotReLoad": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "bigPackageSizeSupport": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true
+  }
+}
